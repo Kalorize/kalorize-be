@@ -3,11 +3,10 @@ import Express from "express";
 import bcrypt from "bcrypt";
 import prisma from "../config/prisma.js";
 import otpGenerator from "otp-generator";
-import sendEmail  from "../utils/sendEmail.js";
-import v from "../validations/index.js";
-import prisma from "../config/prisma.js";
+import sendEmail from "../utils/sendEmail.js";
+import v from "../validations/auth.validation.js";
 import { compare, hash } from "bcrypt";
-import { sign } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { jwtExpired, jwtSecret } from "../config/vars.js";
 
 /**
@@ -31,7 +30,7 @@ async function login(req, res) {
       return res.sendStatus(401);
     }
 
-    const token = sign(
+    const token = jwt.sign(
       {
         id: user.id,
       },
@@ -115,35 +114,37 @@ async function me(req, res) {
 async function forgotPassword(req, res) {
   try {
     // TODO modify this function
-    const { email, otp, newPassword } = req.body
+    const { email, otp, newPassword } = req.body;
 
     if (!email) {
-      throw new Error('need to attach email')
+      throw new Error("need to attach email");
     }
 
     const user = await prisma.User.findUnique({
       where: {
         email: email,
       },
-    })
+    });
 
     if (!user) {
-      throw new Error('user not found')
+      throw new Error("user not found");
     }
 
     if (!otp && !newPassword) {
       //requesting otp code
       //generate otp code
-      const otp = await otpGenerator.generate(4, { 
-        lowerCaseAlphabets:false, upperCaseAlphabets: false, specialChars: false 
+      const otp = await otpGenerator.generate(4, {
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false,
       });
 
       // waktu sekarang
       const now = new Date();
-      
+
       // waktu sekarang + 10 menit
       const tenMinutesLater = new Date(now.getTime() + 10 * 60 * 1000);
-      
+
       await prisma.otp.upsert({
         // jika email sudah tersedia, maka akan mengubah expired
         // jika email tidak ada dalam database maka akan
@@ -166,10 +167,14 @@ async function forgotPassword(req, res) {
         },
         select: null,
       });
-      
-      await sendEmail("fikrialbariq01@gmail.com", "kalorize OTP", `Use this OTP code *${otp}* to reset your kalorize account password.`);
 
-      return res.status(200).send(`otp generation success`)
+      await sendEmail(
+        "fikrialbariq01@gmail.com",
+        "kalorize OTP",
+        `Use this OTP code *${otp}* to reset your kalorize account password.`
+      );
+
+      return res.status(200).send(`otp generation success`);
     }
 
     if (!newPassword) {
@@ -185,7 +190,7 @@ async function forgotPassword(req, res) {
           code: true,
         },
       });
-    
+
       if (!checkOTP) {
         throw new Error("OTP untuk nomor hp yang dipilih tidak tersedia");
       }
@@ -203,14 +208,14 @@ async function forgotPassword(req, res) {
       }
 
       const chance =
-      checkOTP.chance === 1
-        ? {
-            chance: null,
-            lifetime: null,
-          }
-        : {
-            chance: { decrement: 1 },
-          };
+        checkOTP.chance === 1
+          ? {
+              chance: null,
+              lifetime: null,
+            }
+          : {
+              chance: { decrement: 1 },
+            };
 
       if (checkOTP.code !== otp) {
         await prisma.otp.update({
@@ -259,14 +264,14 @@ async function forgotPassword(req, res) {
       const isTimeOut = now.getTime() > checkOTP.lifetime.getTime();
 
       if (isTimeOut) {
-        throw new Error("Waktu mengganti password habis")
+        throw new Error("Waktu mengganti password habis");
       }
 
       if (!checkOTP.valid) {
-        throw new Error("Kode OTP belum dimasukkan")
+        throw new Error("Kode OTP belum dimasukkan");
       }
 
-      const hashed = await bcrypt.hash(newPassword, 10)
+      const hashed = await bcrypt.hash(newPassword, 10);
 
       await prisma.user.update({
         data: {
@@ -282,11 +287,9 @@ async function forgotPassword(req, res) {
     }
 
     return res.sendStatus(200);
-    
   } catch (error) {
     return res.status(400).send(error.message);
   }
-
 }
 
-export default { me, login, register, forgotPassword };
+export default { login, register, forgotPassword, me };

@@ -1,3 +1,3 @@
-import auth from "./auth.middleware";
+import auth from "./auth.middleware.js";
 
-export default auth;
+export default { auth };

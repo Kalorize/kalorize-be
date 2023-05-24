@@ -1,7 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import Express from "express";
 // eslint-disable-next-line no-unused-vars
-import { User } from "@prisma/client";
 import prisma from "../config/prisma.js";
 import { jwtSecret } from "../config/vars.js";
 import jwt from "jsonwebtoken";
@@ -13,7 +12,7 @@ import jwt from "jsonwebtoken";
  * @param {Express.NextFunction} next
  * @returns {Promise<void>}
  */
-export async function auth(req, res, next) {
+async function verify(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
 
@@ -37,3 +36,5 @@ export async function auth(req, res, next) {
     return res.sendStatus(401);
   }
 }
+
+export default { verify };
