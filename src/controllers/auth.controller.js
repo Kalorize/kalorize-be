@@ -4,10 +4,11 @@ import bcrypt from "bcrypt";
 import prisma from "../config/prisma.js";
 import otpGenerator from "otp-generator";
 import sendEmail from "../utils/sendEmail.js";
-import v from "../validations/auth.validation.js";
+import v from "../validations/index.js";
 import { compare, hash } from "bcrypt";
 import jwt from "jsonwebtoken";
 import { jwtExpired, jwtSecret } from "../config/vars.js";
+import logger from "../config/winston.js";
 
 /**
  * Login Controller
@@ -21,6 +22,10 @@ async function login(req, res) {
     const user = await prisma.user.findUniqueOrThrow({
       where: {
         email,
+      },
+      select: {
+        id: true,
+        email: true,
       },
     });
 
@@ -42,6 +47,8 @@ async function login(req, res) {
 
     return res.status(200).json({ token, user });
   } catch (e) {
+    logger.error(e);
+
     return res.sendStatus(400);
   }
 }
@@ -66,12 +73,18 @@ async function register(req, res) {
     const user = await prisma.user.create({
       data: {
         email,
-        hashedPassword,
+        password: hashedPassword,
+      },
+      select: {
+        id: true,
+        email: true,
       },
     });
 
     return res.status(201).json(user);
   } catch (e) {
+    logger.error(e);
+
     return res.sendStatus(400);
   }
 }
@@ -133,7 +146,7 @@ async function forgotPassword(req, res) {
     if (!otp && !newPassword) {
       //requesting otp code
       //generate otp code
-      const otp = await otpGenerator.generate(4, {
+      const otp = otpGenerator.generate(4, {
         lowerCaseAlphabets: false,
         upperCaseAlphabets: false,
         specialChars: false,
@@ -287,8 +300,10 @@ async function forgotPassword(req, res) {
     }
 
     return res.sendStatus(200);
-  } catch (error) {
-    return res.status(400).send(error.message);
+  } catch (e) {
+    logger.error(e);
+
+    return res.status(400).send(e.message);
   }
 }
 
