@@ -22,7 +22,7 @@ async function verify(req, res, next) {
       const payload = jwt.verify(token, jwtSecret);
       const { id } = JSON.parse(JSON.stringify(payload));
 
-      req.user = await prisma.admin.findUniqueOrThrow({
+      req.user = await prisma.user.findUniqueOrThrow({
         where: {
           id,
         },
@@ -31,9 +31,9 @@ async function verify(req, res, next) {
       return next();
     }
 
-    return res.sendStatus(401);
+    return res.status(401).send("missing authorization header");
   } catch (e) {
-    return res.sendStatus(401);
+    return res.status(401).send(e.message);
   }
 }
 
