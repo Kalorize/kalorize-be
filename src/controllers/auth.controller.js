@@ -26,6 +26,7 @@ async function login(req, res) {
       select: {
         id: true,
         email: true,
+        password: true,
       },
     });
 
