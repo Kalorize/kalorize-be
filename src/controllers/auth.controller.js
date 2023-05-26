@@ -9,6 +9,9 @@ import { compare, hash } from "bcrypt";
 import jwt from "jsonwebtoken";
 import { jwtExpired, jwtSecret } from "../config/vars.js";
 import logger from "../config/winston.js";
+import r from "../utils/response.js";
+import { Prisma } from "@prisma/client";
+import { ZodError } from "zod";
 
 /**
  * Login Controller
@@ -33,7 +36,9 @@ async function login(req, res) {
     const valid = await compare(password, user.password);
 
     if (!valid) {
-      return res.sendStatus(401);
+      return res
+        .status(401)
+        .json(r({ status: "success", message: "Invalid password" }));
     }
 
     const token = jwt.sign(
@@ -46,11 +51,23 @@ async function login(req, res) {
       }
     );
 
-    return res.status(200).json({ token, user });
+    return res
+      .status(200)
+      .json(r({ status: "success", data: { token, user } }));
   } catch (e) {
     logger.error(e);
 
-    return res.sendStatus(400);
+    if (e instanceof ZodError) {
+      return res.status(400).json(
+        r({
+          status: "fail",
+          message: "Input validation error",
+          data: e.errors,
+        })
+      );
+    }
+
+    return res.status(400).json(r({ status: "fail", message: e.message }));
   }
 }
 
@@ -66,7 +83,9 @@ async function register(req, res) {
     );
 
     if (password !== repassword) {
-      return res.sendStatus(401);
+      return res
+        .status(401)
+        .json(r({ status: "fail", message: "password didnt match" }));
     }
 
     const hashedPassword = await hash(password, 10);
@@ -82,11 +101,26 @@ async function register(req, res) {
       },
     });
 
-    return res.status(201).json(user);
+    return res.status(201).json(r({ status: "success", data: { user } }));
   } catch (e) {
     logger.error(e);
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      return res
+        .status(400)
+        .json(r({ status: "fail", message: "Email already registered" }));
+    }
 
-    return res.sendStatus(400);
+    if (e instanceof ZodError) {
+      return res.status(400).json(
+        r({
+          status: "fail",
+          message: "Input validation error",
+          data: e.errors,
+        })
+      );
+    }
+
+    return res.status(400).json(r({ status: "fail", message: e.message }));
   }
 }
 
@@ -96,9 +130,10 @@ async function register(req, res) {
  */
 async function me(req, res) {
   try {
-    return res.status(200).json(req.user);
+    const user = req.user;
+    return res.status(200).json(r({ status: "success", data: { user } }));
   } catch (e) {
-    return res.sendStatus(401);
+    return res.status(401).json(r({ status: "fail", message: e.message }));
   }
 }
 
@@ -183,12 +218,14 @@ async function forgotPassword(req, res) {
       });
 
       await sendEmail(
-        "fikrialbariq01@gmail.com",
-        "kalorize OTP",
+        email,
+        "Kalorize OTP",
         `Use this OTP code *${otp}* to reset your kalorize account password.`
       );
 
-      return res.status(200).send(`otp generation success`);
+      return res
+        .status(200)
+        .json(r({ status: "success", message: "otp generation success" }));
     }
 
     if (!newPassword) {
@@ -258,7 +295,11 @@ async function forgotPassword(req, res) {
         select: null,
       });
 
-      return res.status(200).send("Kode OTP berhasil diverivikasi");
+      return res
+        .status(200)
+        .json(
+          r({ status: "success", message: "Kode OTP berhasil diverivikasi" })
+        );
     }
 
     if (!otp) {
@@ -297,14 +338,16 @@ async function forgotPassword(req, res) {
         select: null,
       });
 
-      return res.status(200).send("Password berhasil diganti");
+      return res
+        .status(200)
+        .json(r({ status: "success", message: "Password berhasil diganti" }));
     }
 
-    return res.sendStatus(200);
+    return res.status(200).json(r({ status: "success" }));
   } catch (e) {
     logger.error(e);
 
-    return res.status(400).send(e.message);
+    return res.status(400).json(r({ status: "fail", message: e.message }));
   }
 }
 

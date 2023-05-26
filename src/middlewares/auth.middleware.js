@@ -4,13 +4,12 @@ import Express from "express";
 import prisma from "../config/prisma.js";
 import { jwtSecret } from "../config/vars.js";
 import jwt from "jsonwebtoken";
+import r from "../utils/response.js";
 
 /**
- *
  * @param {Express.Request} req
  * @param {Express.Response} res
  * @param {Express.NextFunction} next
- * @returns {Promise<void>}
  */
 async function verify(req, res, next) {
   try {
@@ -31,9 +30,11 @@ async function verify(req, res, next) {
       return next();
     }
 
-    return res.status(401).send("missing authorization header");
+    return res
+      .status(401)
+      .json(r({ status: "fail", message: "missing authorization header" }));
   } catch (e) {
-    return res.status(401).send(e.message);
+    return `res.status`(401).json(r({ status: "fail", message: e.message }));
   }
 }
 
