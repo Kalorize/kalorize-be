@@ -1,13 +1,14 @@
 import { z } from "zod";
 import { Activity, Gender, Target } from "@prisma/client";
 
-const setup = z.object({
-  gender: z.nativeEnum(Gender),
-  age: z.number(),
-  weight: z.number(),
-  height: z.number(),
-  activity: z.nativeEnum(Activity),
-  target: z.nativeEnum(Target),
+const update = z.object({
+  gender: z.nativeEnum(Gender).optional(),
+  age: z.number().optional(),
+  weight: z.number().optional(),
+  height: z.number().optional(),
+  password: z.string().min(8).optional(),
+  activity: z.nativeEnum(Activity).optional(),
+  target: z.nativeEnum(Target).optional(),
 });
 
-export default { setup };
+export default { update };

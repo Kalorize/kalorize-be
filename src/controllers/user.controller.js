@@ -4,25 +4,27 @@ import r from "../utils/response.js";
 import prisma from "../config/prisma.js";
 import { ZodError } from "zod";
 import { Prisma } from "@prisma/client";
+import { hashSync } from "bcrypt";
 
 /**
  * Login Controller
  * @param {Express.Request} req
  * @param {Express.Response} res
  */
-async function setup(req, res) {
+async function update(req, res) {
   try {
-    const { activity, age, gender, target, weight, height } =
-      await v.user.setup.parseAsync(req.body);
+    const { activity, age, gender, target, weight, height, password } =
+      await v.user.update.parseAsync(req.body);
 
     const user = await prisma.user.update({
       data: {
-        activity,
-        age,
-        gender,
-        target,
-        weight,
-        height,
+        ...(activity ?? { activity: activity }),
+        ...(age ?? { age: age }),
+        ...(gender ?? { gender: gender }),
+        ...(target ?? { target: target }),
+        ...(weight ?? { weight: weight }),
+        ...(height ?? { height: height }),
+        ...(password ?? { password: hashSync(password, 10) }),
       },
       where: {
         id: req.user.id,
@@ -52,4 +54,5 @@ async function setup(req, res) {
   }
 }
 
-export default { setup };
+// eslint-disable-next-line no-undef
+export default { update };

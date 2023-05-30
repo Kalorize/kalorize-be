@@ -4,6 +4,6 @@ import m from "../../middlewares/index.js";
 
 const router = new Router();
 
-router.post("/setup", m.auth.verify, c.user.setup);
+router.put("/setup", m.auth.verify, c.user.update);
 
 export default router;
