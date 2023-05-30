@@ -11,12 +11,15 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique @db.VarChar(255)
-  password String  @db.Char(60)
+  id       Int       @id @default(autoincrement())
+  email    String    @unique @db.VarChar(255)
+  password String    @db.Char(60)
   gender   Gender?
   weight   Float?
+  age      Int?
   height   Float?
+  activity Activity?
+  target   Target?
   Otp      Otp?
 }
 
@@ -25,20 +28,26 @@ enum Gender {
   FEMALE
 }
 
-// model Otp {
-//   user      User      @relation(fields: [userId], references: [id])
-//   userId    Int       @unique
-//   createdAt DateTime  @db.DateTime(2)
-//   code      String
-// }
+enum Activity {
+  EASY
+  MEDIUM
+  HARD
+  EXTREME
+}
+
+enum Target {
+  REDUCE_WEIGHT
+  INCREASE_MUSCLE
+  BE_HEALTHY
+}
 
 model Otp {
-  user        User      @relation(fields: [userEmail], references: [email])
-  id          Int       @id @default(autoincrement())
-  userEmail   String    @unique
-  code        String
-  valid       Boolean   @default(false)
-  chance      Int?
-  expired     DateTime // batas waktu verifikasi
-  lifetime    DateTime? // umur dari otp yang valid
+  user      User      @relation(fields: [userEmail], references: [email])
+  id        Int       @id @default(autoincrement())
+  userEmail String    @unique
+  code      String
+  valid     Boolean   @default(false)
+  chance    Int?
+  expired   DateTime // batas waktu verifikasi
+  lifetime  DateTime? // umur dari otp yang valid
 }

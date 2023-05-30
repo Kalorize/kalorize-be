@@ -38,7 +38,7 @@ async function login(req, res) {
     if (!valid) {
       return res
         .status(401)
-        .json(r({ status: "success", message: "Invalid password" }));
+        .json(r({ status: "fail", message: "Invalid password" }));
     }
 
     const token = jwt.sign(
