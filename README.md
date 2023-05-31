@@ -1,5 +1,7 @@
 # Kalorize Backend
 
+This repo also wrap a python-based server on [kalorize-ml-api](https://github.com/Kalorize/kalorize-ml-api) that serve machine learning models.
+
 ## How to run
 
 1. Clone the repository using git command
