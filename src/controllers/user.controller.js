@@ -18,13 +18,13 @@ async function update(req, res) {
 
     const user = await prisma.user.update({
       data: {
-        ...(activity ?? { activity: activity }),
-        ...(age ?? { age: age }),
-        ...(gender ?? { gender: gender }),
-        ...(target ?? { target: target }),
-        ...(weight ?? { weight: weight }),
-        ...(height ?? { height: height }),
-        ...(password ?? { password: hashSync(password, 10) }),
+        ...(activity && { activity: activity }),
+        ...(age && { age: age }),
+        ...(gender && { gender: gender }),
+        ...(target && { target: target }),
+        ...(weight && { weight: weight }),
+        ...(height && { height: height }),
+        ...(password && { password: hashSync(password, 10) }),
       },
       where: {
         id: req.user.id,
@@ -54,5 +54,4 @@ async function update(req, res) {
   }
 }
 
-// eslint-disable-next-line no-undef
 export default { update };
