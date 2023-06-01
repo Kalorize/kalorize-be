@@ -16,6 +16,7 @@ model User {
   password String    @db.Char(60)
   gender   Gender?
   weight   Float?
+  picture  String?
   age      Int?
   height   Float?
   activity Activity?
