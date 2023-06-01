@@ -3,6 +3,7 @@ import { Activity, Gender, Target } from "@prisma/client";
 
 const update = z.object({
   gender: z.nativeEnum(Gender).optional(),
+  name: z.string().optional(),
   age: z.number().optional(),
   weight: z.number().optional(),
   height: z.number().optional(),
