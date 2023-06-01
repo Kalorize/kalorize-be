@@ -11,16 +11,17 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  email    String    @unique @db.VarChar(255)
-  password String    @db.Char(60)
-  gender   Gender?
-  weight   Float?
-  age      Int?
-  height   Float?
-  activity Activity?
-  target   Target?
-  Otp      Otp?
+  id            Int       @id @default(autoincrement())
+  email         String    @unique @db.VarChar(255)
+  password      String    @db.Char(60)
+  gender        Gender?
+  weight        Float?
+  age           Int?
+  height        Float?
+  activity      Activity?
+  target        Target?
+  Otp           Otp?
+  foodHistory   Food_history[]
 }
 
 enum Gender {
@@ -50,4 +51,39 @@ model Otp {
   chance    Int?
   expired   DateTime // batas waktu verifikasi
   lifetime  DateTime? // umur dari otp yang valid
+}
+
+model Food {
+  RecipeId                Int           @id
+  Name                    String
+  CookTime                String
+  PrepTime                String
+  TotalTime               String
+  RecipeIngredientParts   String
+  Calories                Float
+  FatContent              Float
+  SaturatedFatContent     Float
+  CholesterolContent      Float
+  SodiumContent           Float
+  CarbohydrateContent     Float
+  FiberContent            Float
+  SugarContent            Float
+  ProteinContent          Float
+  RecipeInstructions      String
+  breakfast               Food_history? @relation("breakfast")
+  lunch                   Food_history? @relation("lunch")
+  dinner                  Food_history? @relation("dinner")
+}
+
+model Food_history {
+  id            Int       @id @default(autoincrement())
+  user          User      @relation(fields: [userID], references: [id])
+  breakfast     Food      @relation("breakfast", fields: [breakfastId], references: [RecipeId])
+  breakfastId   Int       @unique
+  lunch         Food      @relation("lunch", fields: [lunchId], references: [RecipeId])
+  lunchId       Int       @unique
+  dinner        Food      @relation("dinner", fields: [dinnerId], references: [RecipeId])
+  dinnerId      Int       @unique
+  userID        Int       @unique
+  date          DateTime
 }
