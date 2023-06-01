@@ -34,7 +34,7 @@ async function verify(req, res, next) {
       .status(401)
       .json(r({ status: "fail", message: "missing authorization header" }));
   } catch (e) {
-    return `res.status`(401).json(r({ status: "fail", message: e.message }));
+    return res.status(401).json(r({ status: "fail", message: e.message }));
   }
 }
 
