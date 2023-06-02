@@ -143,27 +143,10 @@ async function me(req, res) {
  * @param {Express.Response} res
  */
 
-// Cara mereset password
-// 1. Kirim POST request ke /v1/auth/forgot-password dengan mencantumkan email pada body
-// contoh: {
-//   email: *email user*
-// }
-// 2. Setelah OTP berhasil dikirim ke email tersebut kirim POST request ke /v1/auth/forgot-password
-// dengan mencantumkan email dan kode OTP pada body
-// contoh: {
-//   email:"email user",
-//   otp:"0000",
-// }
-// 3 Setelah OTP divalidasi kirim POST request ke /v1/auth/forgot-password dengan mencantumkan email dan password baru yang akan digunakan
-// contoh: {
-//   email:"email user",
-//   newPassword:"newPassword",
-// }
-
 async function forgotPassword(req, res) {
   try {
     // TODO modify this function
-    const { email, otp, newPassword } = req.body;
+    const { email, otp, newpassword, renewpassword } = req.body;
 
     if (!email) {
       throw new Error("need to attach email");
@@ -179,7 +162,7 @@ async function forgotPassword(req, res) {
       throw new Error("user not found");
     }
 
-    if (!otp && !newPassword) {
+    if (!otp && !newpassword) {
       //requesting otp code
       //generate otp code
       const otp = otpGenerator.generate(4, {
@@ -228,7 +211,7 @@ async function forgotPassword(req, res) {
         .json(r({ status: "success", message: "otp generation success" }));
     }
 
-    if (!newPassword) {
+    if (!newpassword) {
       //verifying the otp code
       const checkOTP = await prisma.otp.findFirst({
         where: {
@@ -314,6 +297,12 @@ async function forgotPassword(req, res) {
         },
       });
 
+      if (newpassword !== renewpassword) {
+        return res
+          .status(401)
+          .json(r({ status: "fail", message: "password didnt match" }));
+      }
+
       const now = new Date();
 
       const isTimeOut = now.getTime() > checkOTP.lifetime.getTime();
@@ -326,7 +315,7 @@ async function forgotPassword(req, res) {
         throw new Error("Kode OTP belum dimasukkan");
       }
 
-      const hashed = await bcrypt.hash(newPassword, 10);
+      const hashed = await bcrypt.hash(newpassword, 10);
 
       await prisma.user.update({
         data: {

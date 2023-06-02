@@ -11,4 +11,20 @@ const update = z.object({
   target: z.nativeEnum(Target).optional(),
 });
 
-export default { update };
+const choose = z.object({
+  breakfast: z.object({
+    RecipeId: z.number()
+  }),
+  lunch: z.object({
+    RecipeId: z.number()
+  }),
+  dinner: z.object({
+    RecipeId: z.number()
+  }),
+  date: z.coerce.date().optional(),
+})
+
+const food = z.object({
+  RecipeId: z.number()
+})
+export default { update, choose, food };

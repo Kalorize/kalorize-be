@@ -11,11 +11,12 @@ datasource db {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  email         String    @unique @db.VarChar(255)
-  password      String    @db.Char(60)
+  id            Int             @id @default(autoincrement())
+  email         String          @unique @db.VarChar(255)
+  password      String          @db.Char(60)
   gender        Gender?
   weight        Float?
+  picture       String?
   age           Int?
   height        Float?
   activity      Activity?
@@ -70,20 +71,21 @@ model Food {
   SugarContent            Float
   ProteinContent          Float
   RecipeInstructions      String
-  breakfast               Food_history? @relation("breakfast")
-  lunch                   Food_history? @relation("lunch")
-  dinner                  Food_history? @relation("dinner")
+  ImageUrl                String
+  breakfast               Food_history[] @relation("breakfast")
+  lunch                   Food_history[] @relation("lunch")
+  dinner                  Food_history[] @relation("dinner")
 }
 
 model Food_history {
   id            Int       @id @default(autoincrement())
-  user          User      @relation(fields: [userID], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
   breakfast     Food      @relation("breakfast", fields: [breakfastId], references: [RecipeId])
-  breakfastId   Int       @unique
+  breakfastId   Int       
   lunch         Food      @relation("lunch", fields: [lunchId], references: [RecipeId])
-  lunchId       Int       @unique
+  lunchId       Int       
   dinner        Food      @relation("dinner", fields: [dinnerId], references: [RecipeId])
-  dinnerId      Int       @unique
-  userID        Int       @unique
-  date          DateTime
+  dinnerId      Int       
+  userId        Int       
+  date          String  
 }
