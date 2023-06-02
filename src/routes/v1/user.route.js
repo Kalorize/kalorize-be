@@ -6,5 +6,6 @@ import upload from "../../config/multer.js";
 const router = new Router();
 
 router.put("/", m.auth.verify, upload.single("picture"), c.user.update);
+router.post("/choose-food", m.auth.verify, c.user.choose);
 
 export default router;

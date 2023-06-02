@@ -132,4 +132,77 @@ async function update(req, res) {
   }
 }
 
-export default { update };
+/**
+ * Login Controller
+ * @param {Express.Request} req
+ * @param {Express.Response} res
+ */
+async function choose(req, res) {
+  try {
+    const { breakfast, lunch, dinner, date } = await v.user.choose.parseAsync(req.body)
+    
+    const time = date || Date.now()
+
+    const dateAdd = new Date(time).toISOString().split('T')[0]
+
+    let history = await prisma.food_history.findMany({
+      where : {
+        userId : req.user.id
+      }
+    })
+
+    let found = history.map(e => {
+      if(e.date == dateAdd) {
+        return e
+      }
+    })[0]
+
+    if (found) {
+      const updateFood = await prisma.food_history.update({
+        where : {
+          id : found.id
+        },
+        data : {
+          breakfastId : breakfast.RecipeId,
+          lunchId : lunch.RecipeId,
+          dinnerId : dinner.RecipeId
+        }
+      })
+
+      return res.status(200).json(r({ status: "success", data: { updateFood } }));
+    }
+
+    const chooseFood = await prisma.food_history.create({
+      data : {
+        userId : req.user.id,
+        breakfastId : breakfast.RecipeId,
+        lunchId : lunch.RecipeId,
+        dinnerId : dinner.RecipeId,
+        date : dateAdd
+      }
+    })
+
+    return res.status(200).json(r({ status: "success", data: { chooseFood } }));
+  } catch (e) {
+    logger.error(e);
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      return res
+        .status(400)
+        .json(r({ status: "fail", message: "Food already choose" }));
+    }
+
+    if (e instanceof ZodError) {
+      return res.status(400).json(
+        r({
+          status: "fail",
+          message: "Input validation error",
+          data: e.errors[0].message,
+        })
+      );
+    }
+
+    return res.status(400).json(r({ status: "fail", message: e.message }));
+  }
+}
+
+export default { update, choose };
