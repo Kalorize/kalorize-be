@@ -6,5 +6,6 @@ const router = new Router();
 
 router.put("/", m.auth.verify, c.user.update);
 router.post("/choose-food", m.auth.verify, c.user.choose);
+router.get("/get-food", m.auth.verify, c.user.getFood);
 
 export default router;

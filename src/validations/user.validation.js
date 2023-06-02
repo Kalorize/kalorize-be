@@ -13,12 +13,16 @@ const update = z.object({
 
 const foodSchema = z.object({
   RecipeId: z.number()
-})
+});
 const choose = z.object({
   breakfast: foodSchema,
   lunch: foodSchema,
   dinner: foodSchema,
   date: z.coerce.date().optional(),
-})
+});
 
-export default { update, choose };
+const getFood = z.object({
+  date: z.coerce.date()
+});
+
+export default { update, choose, getFood };

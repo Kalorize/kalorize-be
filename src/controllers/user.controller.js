@@ -110,7 +110,7 @@ async function choose(req, res) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
       return res
         .status(400)
-        .json(r({ status: "fail", message: "Food already choose" }));
+        .json(r({ status: "fail", message: "Prisma parameter error" }));
     }
 
     if (e instanceof ZodError) {
@@ -127,4 +127,54 @@ async function choose(req, res) {
   }
 }
 
-export default { update, choose };
+/**
+ * Login Controller
+ * @param {Express.Request} req
+ * @param {Express.Response} res
+ */
+async function getFood(req, res) {
+  try {
+    const { date } = await v.user.getFood.parseAsync(req.body)
+
+    let history = await prisma.food_history.findMany({
+      where : {
+        userId : req.user.id
+      }
+    })
+
+    const dateString = date.toISOString().split('T')[0]
+
+    let found = history.map(e => {
+      if(e.date == dateString) {
+        return e
+      }
+    })[0]
+
+    if (!found) {
+      return res.status(404).json(r({ status: "fail", message: "data not found"}));
+    }
+
+    return res.status(200).json(r({ status: "success", data: { found } }));
+  } catch (e) {
+    logger.error(e);
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      return res
+        .status(400)
+        .json(r({ status: "fail", message: "Prisma parameter error" }));
+    }
+
+    if (e instanceof ZodError) {
+      return res.status(400).json(
+        r({
+          status: "fail",
+          message: "Input validation error",
+          data: e.errors[0].message,
+        })
+      );
+    }
+
+    return res.status(400).json(r({ status: "fail", message: e.message }));
+  }
+}
+
+export default { update, choose, getFood };
