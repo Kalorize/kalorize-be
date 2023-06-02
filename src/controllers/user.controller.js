@@ -7,6 +7,7 @@ import { Prisma } from "@prisma/client";
 import { hashSync } from "bcrypt";
 import { store } from "../utils/storage.js";
 import { bucket } from "../config/vars.js";
+import axios, { AxiosError } from "axios";
 
 /**
  * Login Controller
@@ -27,15 +28,19 @@ async function update(req, res) {
       picture = `${bucket}/${await store(file, "images/")}`;
     }
 
-    const isRecChanged = [gender, weight, height, age, activity, target].every(
-      (item) => item !== null
+    const isRecChanged = [gender, weight, height, age, activity, target].some(
+      (item) => item
     );
+
+    logger.info(`isRecChanged: ${isRecChanged}`);
 
     const u = await prisma.user.findUniqueOrThrow({
       where: {
         id: req.user.id,
       },
     });
+
+    console.log(u);
 
     const isRecExist = [
       u.gender,
@@ -46,14 +51,43 @@ async function update(req, res) {
       u.target,
     ].every((item) => item !== null);
 
-    if (!isRecExist) {
-      // fetch ML then return the data
-    } else {
-      if (!isRecChanged) {
-        // return the data
-      } else {
-        // fetch ML then return the data
-      }
+    logger.info(`isRecExist: ${isRecExist}`);
+
+    const data = {
+      gender: gender ?? u.gender,
+      weight: weight ?? u.weight,
+      age: age ?? u.age,
+      height: height ?? u.height,
+      activity_level: activity ? activity : u.activity,
+      target: target ? target : u.target,
+    };
+
+    const dataIsDefined = (data) => Object.values(data).every((value) => value);
+
+    logger.info(`dataIsDefined: ${dataIsDefined(data)}`);
+
+    if ((!isRecExist || isRecChanged) && dataIsDefined(data)) {
+      data.activity_level = data.activity_level.toLowerCase();
+      data.gender = data.gender.toLowerCase();
+      data.target = data.target.toLowerCase();
+
+      console.log(data);
+
+      axios
+        .post("https://f2hwg-cwx4yokorq-et.a.run.app/food_rec", data, {
+          headers: {
+            "x-api-key": "kalorize-ml",
+          },
+        })
+        .then((r) => {
+          console.log(r.data);
+          // save data into recommendation table
+        })
+        .catch((e) => {
+          if (e instanceof AxiosError) {
+            console.log(e.response);
+          }
+        });
     }
 
     const user = await prisma.user.update({
@@ -72,6 +106,8 @@ async function update(req, res) {
         id: req.user.id,
       },
     });
+
+    console.log(user);
 
     return res.status(200).json(r({ status: "success", data: { user } }));
   } catch (e) {
