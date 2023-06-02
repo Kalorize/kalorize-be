@@ -212,7 +212,7 @@ async function choose(req, res) {
  */
 async function getFood(req, res) {
   try {
-    const { date } = await v.user.getFood.parseAsync(req.body)
+    const { date } = await v.user.getFood.parseAsync(req.query)
 
     let history = await prisma.food_history.findMany({
       where : {
@@ -221,13 +221,14 @@ async function getFood(req, res) {
     })
 
     const dateString = date.toISOString().split('T')[0]
-
+    
     let found = history.map(e => {
       if(e.date == dateString) {
         return e
       }
     })[0]
 
+    console.log(found);
     if (!found) {
       return res.status(404).json(r({ status: "fail", message: "data not found"}));
     }
