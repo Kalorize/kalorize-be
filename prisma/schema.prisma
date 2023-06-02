@@ -23,6 +23,7 @@ model User {
   target        Target?
   Otp           Otp?
   foodHistory   Food_history[]
+
 }
 
 enum Gender {
@@ -53,6 +54,7 @@ model Otp {
   expired   DateTime // batas waktu verifikasi
   lifetime  DateTime? // umur dari otp yang valid
 }
+
 
 model Food {
   RecipeId                Int           @id

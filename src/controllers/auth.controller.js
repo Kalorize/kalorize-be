@@ -7,7 +7,7 @@ import sendEmail from "../utils/sendEmail.js";
 import v from "../validations/index.js";
 import { compare, hash } from "bcrypt";
 import jwt from "jsonwebtoken";
-import { jwtExpired, jwtSecret } from "../config/vars.js";
+import { jwtSecret } from "../config/vars.js";
 import logger from "../config/winston.js";
 import r from "../utils/response.js";
 import { Prisma } from "@prisma/client";
@@ -26,11 +26,6 @@ async function login(req, res) {
       where: {
         email,
       },
-      select: {
-        id: true,
-        email: true,
-        password: true,
-      },
     });
 
     const valid = await compare(password, user.password);
@@ -45,10 +40,7 @@ async function login(req, res) {
       {
         id: user.id,
       },
-      jwtSecret,
-      {
-        expiresIn: jwtExpired,
-      }
+      jwtSecret
     );
 
     return res
@@ -78,9 +70,8 @@ async function login(req, res) {
  */
 async function register(req, res) {
   try {
-    const { email, password, repassword } = await v.auth.register.parseAsync(
-      req.body
-    );
+    const { name, email, password, repassword } =
+      await v.auth.register.parseAsync(req.body);
 
     if (password !== repassword) {
       return res
@@ -92,12 +83,15 @@ async function register(req, res) {
 
     const user = await prisma.user.create({
       data: {
+        name,
         email,
         password: hashedPassword,
       },
       select: {
         id: true,
+        name: true,
         email: true,
+        password: true,
       },
     });
 
