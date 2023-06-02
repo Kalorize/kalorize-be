@@ -61,16 +61,7 @@ async function update(req, res) {
  */
 async function choose(req, res) {
   try {
-    const breakfast =
-      await v.user.food.parseAsync(req.body.breakfast);
-    const lunch =
-      await v.user.food.parseAsync(req.body.lunch);
-    const dinner =
-      await v.user.food.parseAsync(req.body.dinner);
-
-    const {date} = req.body
-
-    // const { breakfast, lunch, dinner, date } = await v.user.choose.parseAsync(req.body)
+    const { breakfast, lunch, dinner, date } = await v.user.choose.parseAsync(req.body)
     
     const time = date || Date.now()
 

@@ -11,20 +11,14 @@ const update = z.object({
   target: z.nativeEnum(Target).optional(),
 });
 
+const foodSchema = z.object({
+  RecipeId: z.number()
+})
 const choose = z.object({
-  breakfast: z.object({
-    RecipeId: z.number()
-  }),
-  lunch: z.object({
-    RecipeId: z.number()
-  }),
-  dinner: z.object({
-    RecipeId: z.number()
-  }),
+  breakfast: foodSchema,
+  lunch: foodSchema,
+  dinner: foodSchema,
   date: z.coerce.date().optional(),
 })
 
-const food = z.object({
-  RecipeId: z.number()
-})
-export default { update, choose, food };
+export default { update, choose };
