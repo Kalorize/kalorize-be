@@ -259,12 +259,12 @@ async function forgotPassword(req, res) {
         throw new Error("Kode OTP salah");
       }
 
-      const tenMinutesLater = new Date(now.getTime() + 5 * 60 * 1000);
+      const fiveMinutesLater = new Date(now.getTime() + 5 * 60 * 1000);
 
       await prisma.otp.update({
         data: {
           valid: true,
-          lifetime: tenMinutesLater,
+          lifetime: fiveMinutesLater,
         },
         where: {
           userEmail: email,
