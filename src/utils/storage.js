@@ -4,7 +4,6 @@ import logger from "../config/winston.js";
 import { env, project, bucket } from "../config/vars.js";
 
 const credentials = join(resolve(), "credentials.json");
-console.log(credentials);
 
 const storage =
   env === "production"

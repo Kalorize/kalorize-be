@@ -12,6 +12,7 @@ import logger from "../config/winston.js";
 import r from "../utils/response.js";
 import { Prisma } from "@prisma/client";
 import { ZodError } from "zod";
+import { userInclude } from "../constants/index.js";
 
 /**
  * Login Controller
@@ -124,7 +125,13 @@ async function register(req, res) {
  */
 async function me(req, res) {
   try {
-    const user = req.user;
+    // const user = req.user;
+    const user = await prisma.user.findUnique({
+      where: {
+        id: Number(req.user.id),
+      },
+      include: userInclude,
+    });
     return res.status(200).json(r({ status: "success", data: { user } }));
   } catch (e) {
     return res.status(401).json(r({ status: "fail", message: e.message }));

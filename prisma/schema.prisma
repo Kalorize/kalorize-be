@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,19 +8,82 @@ datasource db {
 }
 
 model User {
-  id            Int             @id @default(autoincrement())
-  name          String
-  email         String          @unique @db.VarChar(255)
-  password      String          @db.Char(60)
-  gender        Gender?
-  weight        Float?
-  picture       String?
-  age           Int?
-  height        Float?
-  activity      Activity?
-  target        Target?
-  Otp           Otp?
-  foodHistory   Food_history[]
+  id             Int             @id @default(autoincrement())
+  name           String
+  email          String          @unique @db.VarChar(255)
+  password       String          @db.Char(60)
+  gender         Gender?
+  weight         Float?
+  picture        String?
+  age            Int?
+  height         Float?
+  activity       Activity?
+  target         Target?
+  otp            Otp?
+  foodHistories  FoodHistory[]
+  reccomendation Reccomendation?
+}
+
+model Otp {
+  user      User      @relation(fields: [userEmail], references: [email])
+  id        Int       @id @default(autoincrement())
+  userEmail String    @unique
+  code      String
+  valid     Boolean   @default(false)
+  chance    Int?
+  expired   DateTime // batas waktu verifikasi
+  lifetime  DateTime? // umur dari otp yang valid
+}
+
+model Reccomendation {
+  id        Int    @id @default(autoincrement())
+  userId    Int    @unique
+  protein   Float
+  calories  Float
+  breakfast Food[] @relation("breakfast_reccomendation")
+  lunch     Food[] @relation("lunch_reccomendation")
+  dinner    Food[] @relation("dinner_reccomendation")
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Food {
+  id             Int              @id @default(autoincrement())
+  name           String
+  cookTime       String
+  prepTime       String
+  totalTime      String
+  ingredients    String           @db.Text
+  calories       Float
+  fat            Float
+  saturatedFat   Float
+  cholesterol    Float
+  sodium         Float
+  carbohydrate   Float
+  fiber          Float
+  sugar          Float
+  protein        Float
+  instructions   String           @db.Text
+  imageUrl       String           @db.Text
+  breakfastHists FoodHistory[]    @relation("breakfast_history")
+  lunchHists     FoodHistory[]    @relation("lunch_history")
+  dinnerHists    FoodHistory[]    @relation("dinner_history")
+  breakfastRecs  Reccomendation[] @relation("breakfast_reccomendation")
+  lunchRecs      Reccomendation[] @relation("lunch_reccomendation")
+  dinnerRecs     Reccomendation[] @relation("dinner_reccomendation")
+}
+
+model FoodHistory {
+  id          Int    @id @default(autoincrement())
+  userId      Int
+  date        String
+  breakfastId Int
+  lunchId     Int
+  dinnerId    Int
+  lunch       Food   @relation("lunch_history", fields: [lunchId], references: [id])
+  user        User   @relation(fields: [userId], references: [id])
+  breakfast   Food   @relation("breakfast_history", fields: [breakfastId], references: [id])
+  dinner      Food   @relation("dinner_history", fields: [dinnerId], references: [id])
 }
 
 enum Gender {
@@ -42,52 +102,4 @@ enum Target {
   REDUCE_WEIGHT
   INCREASE_MUSCLE
   BE_HEALTHY
-}
-
-model Otp {
-  user      User      @relation(fields: [userEmail], references: [email])
-  id        Int       @id @default(autoincrement())
-  userEmail String    @unique
-  code      String
-  valid     Boolean   @default(false)
-  chance    Int?
-  expired   DateTime // batas waktu verifikasi
-  lifetime  DateTime? // umur dari otp yang valid
-}
-
-
-model Food {
-  RecipeId                Int           @id
-  Name                    String
-  CookTime                String
-  PrepTime                String
-  TotalTime               String
-  RecipeIngredientParts   String
-  Calories                Float
-  FatContent              Float
-  SaturatedFatContent     Float
-  CholesterolContent      Float
-  SodiumContent           Float
-  CarbohydrateContent     Float
-  FiberContent            Float
-  SugarContent            Float
-  ProteinContent          Float
-  RecipeInstructions      String
-  ImageUrl                String
-  breakfast               Food_history[] @relation("breakfast")
-  lunch                   Food_history[] @relation("lunch")
-  dinner                  Food_history[] @relation("dinner")
-}
-
-model Food_history {
-  id            Int       @id @default(autoincrement())
-  user          User      @relation(fields: [userId], references: [id])
-  breakfast     Food      @relation("breakfast", fields: [breakfastId], references: [RecipeId])
-  breakfastId   Int       
-  lunch         Food      @relation("lunch", fields: [lunchId], references: [RecipeId])
-  lunchId       Int       
-  dinner        Food      @relation("dinner", fields: [dinnerId], references: [RecipeId])
-  dinnerId      Int       
-  userId        Int       
-  date          String  
 }

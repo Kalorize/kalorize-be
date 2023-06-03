@@ -7,7 +7,8 @@ import { Prisma } from "@prisma/client";
 import { hashSync } from "bcrypt";
 import { store } from "../utils/storage.js";
 import { bucket } from "../config/vars.js";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
+import { userInclude } from "../constants/index.js";
 
 /**
  * Login Controller
@@ -62,33 +63,102 @@ async function update(req, res) {
       target: target ? target : u.target,
     };
 
-    const dataIsDefined = (data) => Object.values(data).every((value) => value);
+    const isAbleToUpRecs = (data) =>
+      Object.values(data).every((value) => value);
 
-    logger.info(`dataIsDefined: ${dataIsDefined(data)}`);
+    logger.info(`isAbleToUpRecs(data): ${isAbleToUpRecs(data)}`);
 
-    if ((!isRecExist || isRecChanged) && dataIsDefined(data)) {
+    /**
+     * @type {Prisma.Enumerable<Prisma.FoodWhereUniqueInput>}
+     */
+    const breakfast = [];
+
+    /**
+     * @type {Prisma.Enumerable<Prisma.FoodWhereUniqueInput>}
+     */
+    const lunch = [];
+
+    /**
+     * @type {Prisma.Enumerable<Prisma.FoodWhereUniqueInput>}
+     */
+    const dinner = [];
+
+    let calories = 0;
+
+    let protein = 0;
+
+    /**
+     * @type {Prisma.ReccomendationUpdateOneWithoutUserNestedInput}
+     */
+    const reccomendation = {};
+
+    if ((!isRecExist || isRecChanged) && isAbleToUpRecs(data)) {
       data.activity_level = data.activity_level.toLowerCase();
       data.gender = data.gender.toLowerCase();
       data.target = data.target.toLowerCase();
 
       console.log(data);
 
-      axios
-        .post("https://f2hwg-cwx4yokorq-et.a.run.app/food_rec", data, {
+      const api = await axios.post(
+        "https://f2hwg-cwx4yokorq-et.a.run.app/food_rec",
+        data,
+        {
           headers: {
             "x-api-key": "kalorize-ml",
           },
-        })
-        .then((r) => {
-          console.log(r.data);
-          // save data into recommendation table
-        })
-        .catch((e) => {
-          if (e instanceof AxiosError) {
-            console.log(e.response);
-          }
-        });
+        }
+      );
+
+      api.data.breakfast.forEach((b) => {
+        breakfast.push({ id: Number(b.RecipeId) });
+      });
+
+      api.data.lunch.forEach((b) => {
+        lunch.push({ id: b.RecipeId });
+      });
+
+      api.data.dinner.map((b) => {
+        dinner.push({ id: b.RecipeId });
+      });
+
+      calories = Number(api.data.calories);
+      protein = Number(api.data.proteins);
+
+      reccomendation.upsert = {
+        create: {
+          calories,
+          protein,
+          breakfast: {
+            connect: breakfast,
+          },
+          lunch: {
+            connect: lunch,
+          },
+          dinner: {
+            connect: dinner,
+          },
+        },
+        update: {
+          calories,
+          protein,
+          breakfast: {
+            connect: breakfast,
+          },
+          lunch: {
+            connect: lunch,
+          },
+          dinner: {
+            connect: dinner,
+          },
+        },
+      };
     }
+
+    const isReadyToUpRecs = [breakfast, lunch, dinner, calories, protein].every(
+      (i) => Boolean(i)
+    );
+
+    logger.info(`isReadyToUpRecs: ${isReadyToUpRecs}`);
 
     const user = await prisma.user.update({
       data: {
@@ -101,10 +171,14 @@ async function update(req, res) {
         ...(weight && { weight: weight }),
         ...(height && { height: height }),
         ...(password && { password: hashSync(password, 10) }),
+        ...(isReadyToUpRecs && {
+          reccomendation: reccomendation,
+        }),
       },
       where: {
         id: req.user.id,
       },
+      include: userInclude,
     });
 
     console.log(user);
@@ -139,48 +213,52 @@ async function update(req, res) {
  */
 async function choose(req, res) {
   try {
-    const { breakfast, lunch, dinner, date } = await v.user.choose.parseAsync(req.body)
-    
-    const time = date || Date.now()
+    const { breakfast, lunch, dinner, date } = await v.user.choose.parseAsync(
+      req.body
+    );
 
-    const dateAdd = new Date(time).toISOString().split('T')[0]
+    const time = date || Date.now();
 
-    let history = await prisma.food_history.findMany({
-      where : {
-        userId : req.user.id
+    const dateAdd = new Date(time).toISOString().split("T")[0];
+
+    let history = await prisma.foodHistory.findMany({
+      where: {
+        userId: req.user.id,
+      },
+    });
+
+    let found = history.map((e) => {
+      if (e.date == dateAdd) {
+        return e;
       }
-    })
-
-    let found = history.map(e => {
-      if(e.date == dateAdd) {
-        return e
-      }
-    })[0]
+    })[0];
 
     if (found) {
-      const updateFood = await prisma.food_history.update({
-        where : {
-          id : found.id
+      const updateFood = await prisma.foodHistory.update({
+        where: {
+          id: found.id,
         },
-        data : {
-          breakfastId : breakfast.RecipeId,
-          lunchId : lunch.RecipeId,
-          dinnerId : dinner.RecipeId
-        }
-      })
+        data: {
+          breakfastId: breakfast.RecipeId,
+          lunchId: lunch.RecipeId,
+          dinnerId: dinner.RecipeId,
+        },
+      });
 
-      return res.status(200).json(r({ status: "success", data: { updateFood } }));
+      return res
+        .status(200)
+        .json(r({ status: "success", data: { updateFood } }));
     }
 
-    const chooseFood = await prisma.food_history.create({
-      data : {
-        userId : req.user.id,
-        breakfastId : breakfast.RecipeId,
-        lunchId : lunch.RecipeId,
-        dinnerId : dinner.RecipeId,
-        date : dateAdd
-      }
-    })
+    const chooseFood = await prisma.foodHistory.create({
+      data: {
+        userId: req.user.id,
+        breakfastId: breakfast.RecipeId,
+        lunchId: lunch.RecipeId,
+        dinnerId: dinner.RecipeId,
+        date: dateAdd,
+      },
+    });
 
     return res.status(200).json(r({ status: "success", data: { chooseFood } }));
   } catch (e) {
@@ -212,25 +290,27 @@ async function choose(req, res) {
  */
 async function getFood(req, res) {
   try {
-    const { date } = await v.user.getFood.parseAsync(req.query)
+    const { date } = await v.user.getFood.parseAsync(req.query);
 
-    let history = await prisma.food_history.findMany({
-      where : {
-        userId : req.user.id
-      }
-    })
+    let history = await prisma.foodHistory.findMany({
+      where: {
+        userId: req.user.id,
+      },
+    });
 
-    const dateString = date.toISOString().split('T')[0]
-    
-    let found = history.map(e => {
-      if(e.date == dateString) {
-        return e
+    const dateString = date.toISOString().split("T")[0];
+
+    let found = history.map((e) => {
+      if (e.date == dateString) {
+        return e;
       }
-    })[0]
+    })[0];
 
     console.log(found);
     if (!found) {
-      return res.status(404).json(r({ status: "fail", message: "data not found"}));
+      return res
+        .status(404)
+        .json(r({ status: "fail", message: "data not found" }));
     }
 
     return res.status(200).json(r({ status: "success", data: { found } }));
