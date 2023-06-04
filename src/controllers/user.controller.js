@@ -187,9 +187,7 @@ async function update(req, res) {
   } catch (e) {
     logger.error(e);
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
-      return res
-        .status(400)
-        .json(r({ status: "fail", message: "Email already registered" }));
+      return res.status(400).json(r({ status: "fail", message: e.message }));
     }
 
     if (e instanceof ZodError) {
