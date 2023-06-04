@@ -223,7 +223,7 @@ async function choose(req, res) {
 
     let history = await prisma.foodHistory.findMany({
       where: {
-        userId: req.user.id,
+        userId: Number(req.user.id),
       },
     });
 
@@ -252,7 +252,7 @@ async function choose(req, res) {
 
     const chooseFood = await prisma.foodHistory.create({
       data: {
-        userId: req.user.id,
+        userId: Number(req.user.RecipeId),
         breakfastId: breakfast.RecipeId,
         lunchId: lunch.RecipeId,
         dinnerId: dinner.RecipeId,
@@ -294,7 +294,7 @@ async function getFood(req, res) {
 
     let history = await prisma.foodHistory.findMany({
       where: {
-        userId: req.user.id,
+        userId: Number(req.user.id),
       },
     });
 
@@ -306,14 +306,45 @@ async function getFood(req, res) {
       }
     })[0];
 
-    console.log(found);
     if (!found) {
       return res
         .status(404)
         .json(r({ status: "fail", message: "data not found" }));
     }
 
-    return res.status(200).json(r({ status: "success", data: { found } }));
+    const breakfastFound = await prisma.food.findUnique({
+      where: {
+        id: found.breakfastId,
+      }
+    })
+
+    const lunchFound = await prisma.food.findUnique({
+      where: {
+        id: found.lunchId,
+      }
+    })
+
+    const dinnerFound = await prisma.food.findUnique({
+      where: {
+        id: found.dinnerId,
+      }
+    })
+
+    // Assign back the id to be RecipeId
+    delete Object.assign(breakfastFound, { RecipeId: breakfastFound.id })['id'];
+    delete Object.assign(lunchFound, { RecipeId: lunchFound.id })['id'];
+    delete Object.assign(dinnerFound, { RecipeId: dinnerFound.id })['id'];
+
+    return res
+      .status(200)
+      .json(r({
+        status: "success", 
+        data: {
+          breakfast: breakfastFound,
+          lunch: lunchFound,
+          dinner: dinnerFound
+        }
+      }));
   } catch (e) {
     logger.error(e);
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
