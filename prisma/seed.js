@@ -17,10 +17,6 @@ const stream = fs
  */
 const rows = [];
 
-/**
- * @type {Food[]}
- */
-const foods = [];
 
 stream.on("data", async (r) => {
   rows.push({
@@ -45,19 +41,15 @@ stream.on("data", async (r) => {
 });
 
 stream.on("end", async () => {
-  for (const row of rows) {
-    const food = await prisma.food.upsert({
+  rows.forEach(async (row) => {
+    await prisma.food.upsert({
       create: row,
       update: row,
       where: {
         id: row.id,
       },
     });
-
-    foods.push(food);
-  }
-
-  console.log(foods.length);
+  });
 });
 
 stream.on("error", (e) => {
