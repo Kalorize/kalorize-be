@@ -219,17 +219,23 @@ async function choose(req, res) {
 
     const dateAdd = new Date(time).toISOString().split("T")[0];
 
-    let history = await prisma.foodHistory.findMany({
+    const history = await prisma.foodHistory.findMany({
       where: {
         userId: Number(req.user.id),
       },
     });
 
-    let found = history.map((e) => {
+    const found = history.map((e) => {
       if (e.date == dateAdd) {
         return e;
       }
     })[0];
+
+    const recData = await prisma.reccomendation.findFirstOrThrow({
+      where: {
+        userId: Number(req.user.id),
+      }
+    })
 
     if (found) {
       const updateFood = await prisma.foodHistory.update({
@@ -240,6 +246,8 @@ async function choose(req, res) {
           breakfastId: breakfast.RecipeId,
           lunchId: lunch.RecipeId,
           dinnerId: dinner.RecipeId,
+          calories: recData.calories,
+          protein: recData.protein
         },
       });
 
@@ -248,12 +256,16 @@ async function choose(req, res) {
         .json(r({ status: "success", data: { updateFood } }));
     }
 
+    console.log(req.user.id);
+
     const chooseFood = await prisma.foodHistory.create({
       data: {
-        userId: Number(req.user.RecipeId),
+        userId: Number(req.user.id),
         breakfastId: breakfast.RecipeId,
         lunchId: lunch.RecipeId,
         dinnerId: dinner.RecipeId,
+        calories: recData.calories,
+        protein: recData.protein,
         date: dateAdd,
       },
     });
@@ -338,6 +350,8 @@ async function getFood(req, res) {
       .json(r({
         status: "success", 
         data: {
+          calories: found.calories,
+          protein: found.protein,
           breakfast: breakfastFound,
           lunch: lunchFound,
           dinner: dinnerFound
