@@ -80,6 +80,8 @@ model FoodHistory {
   breakfastId Int
   lunchId     Int
   dinnerId    Int
+  protein     Float
+  calories    Float
   lunch       Food   @relation("lunch_history", fields: [lunchId], references: [id])
   user        User   @relation(fields: [userId], references: [id])
   breakfast   Food   @relation("breakfast_history", fields: [breakfastId], references: [id])
