@@ -13,7 +13,7 @@ const update = z.object({
 });
 
 const foodSchema = z.object({
-  RecipeId: z.number()
+  id: z.number()
 });
 const choose = z.object({
   breakfast: foodSchema,

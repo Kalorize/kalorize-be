@@ -244,9 +244,9 @@ async function choose(req, res) {
         },
         data: {
           breakfastId: breakfast.RecipeId,
-          lunchId: lunch.RecipeId,
-          dinnerId: dinner.RecipeId,
-          calories: recData.calories,
+          lunchId: lunch.id,
+          dinnerId: dinner.id,
+          calories: recData.id,
           protein: recData.protein
         },
       });
@@ -261,9 +261,9 @@ async function choose(req, res) {
     const chooseFood = await prisma.foodHistory.create({
       data: {
         userId: Number(req.user.id),
-        breakfastId: breakfast.RecipeId,
-        lunchId: lunch.RecipeId,
-        dinnerId: dinner.RecipeId,
+        breakfastId: breakfast.id,
+        lunchId: lunch.id,
+        dinnerId: dinner.id,
         calories: recData.calories,
         protein: recData.protein,
         date: dateAdd,
@@ -339,11 +339,6 @@ async function getFood(req, res) {
         id: found.dinnerId,
       }
     })
-
-    // Assign back the id to be RecipeId
-    delete Object.assign(breakfastFound, { RecipeId: breakfastFound.id })['id'];
-    delete Object.assign(lunchFound, { RecipeId: lunchFound.id })['id'];
-    delete Object.assign(dinnerFound, { RecipeId: dinnerFound.id })['id'];
 
     return res
       .status(200)
