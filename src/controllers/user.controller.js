@@ -345,6 +345,7 @@ async function getFood(req, res) {
       .json(r({
         status: "success", 
         data: {
+          id: found.id,
           calories: found.calories,
           protein: found.protein,
           breakfast: breakfastFound,
