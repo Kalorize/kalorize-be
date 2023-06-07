@@ -2,6 +2,7 @@ import axios from "axios";
 import r from "../utils/response.js";
 import FormData from "form-data";
 import fs from "fs";
+import { writeFile, unlink } from "fs/promises";
 import { extname, join, resolve } from "path";
 
 /**
@@ -24,7 +25,7 @@ async function predict(req, res) {
       `${Date.now()}${extname(req.file.originalname)}`
     );
 
-    fs.writeFileSync(file, req.file.buffer);
+    await writeFile(file, req.file.buffer);
 
     data.append("picture", fs.createReadStream(file), {
       filename: req.file.filename,
@@ -41,7 +42,7 @@ async function predict(req, res) {
       }
     );
 
-    fs.unlinkSync(file);
+    unlink(file);
 
     return res.status(200).json(api.data);
   } catch (e) {
