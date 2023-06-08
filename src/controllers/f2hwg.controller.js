@@ -4,6 +4,7 @@ import FormData from "form-data";
 import fs from "fs";
 import { writeFile, unlink } from "fs/promises";
 import { extname, join, resolve } from "path";
+import { mlApiBaseUrl, mlApiKey } from "../config/vars.js";
 
 /**
  * @param {Express.Request} req
@@ -32,15 +33,11 @@ async function predict(req, res) {
       contentType: req.file.mimetype,
     });
 
-    const api = await axios.post(
-      "https://f2hwg-cwx4yokorq-et.a.run.app/f2hwg",
-      data,
-      {
-        headers: data.getHeaders({
-          "x-api-key": "kalorize-ml",
-        }),
-      }
-    );
+    const api = await axios.post(`${mlApiBaseUrl}/f2hwg`, data, {
+      headers: data.getHeaders({
+        "x-api-key": mlApiKey,
+      }),
+    });
 
     unlink(file);
 

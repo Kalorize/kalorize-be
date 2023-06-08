@@ -12,3 +12,5 @@ export const email = String(process.env.EMAIL);
 export const email_password = String(process.env.EMAIL_PASSWORD);
 export const project = String(process.env.GCP_PROJECT);
 export const bucket = String(process.env.GCP_BUCKET);
+export const mlApiBaseUrl = String(process.env.ML_API_BASE_URL);
+export const mlApiKey = String(process.env.ML_API_KEY);

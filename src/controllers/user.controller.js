@@ -6,7 +6,7 @@ import { ZodError } from "zod";
 import { Prisma } from "@prisma/client";
 import { hashSync } from "bcrypt";
 import { store } from "../utils/storage.js";
-import { bucket } from "../config/vars.js";
+import { bucket, mlApiBaseUrl, mlApiKey } from "../config/vars.js";
 import axios from "axios";
 import { userInclude } from "../constants/index.js";
 
@@ -99,15 +99,11 @@ async function update(req, res) {
 
       console.log(data);
 
-      const api = await axios.post(
-        "https://f2hwg-cwx4yokorq-et.a.run.app/food_rec",
-        data,
-        {
-          headers: {
-            "x-api-key": "kalorize-ml",
-          },
-        }
-      );
+      const api = await axios.post(`${mlApiBaseUrl}/food_rec`, data, {
+        headers: {
+          "x-api-key": mlApiKey,
+        },
+      });
 
       api.data.breakfast.forEach((b) => {
         breakfast.push({ id: Number(b.RecipeId) });
@@ -234,8 +230,8 @@ async function choose(req, res) {
     const recData = await prisma.reccomendation.findFirstOrThrow({
       where: {
         userId: Number(req.user.id),
-      }
-    })
+      },
+    });
 
     if (found) {
       const updateFood = await prisma.foodHistory.update({
@@ -247,7 +243,7 @@ async function choose(req, res) {
           lunchId: lunch.id,
           dinnerId: dinner.id,
           calories: recData.id,
-          protein: recData.protein
+          protein: recData.protein,
         },
       });
 
@@ -325,34 +321,34 @@ async function getFood(req, res) {
     const breakfastFound = await prisma.food.findUnique({
       where: {
         id: found.breakfastId,
-      }
-    })
+      },
+    });
 
     const lunchFound = await prisma.food.findUnique({
       where: {
         id: found.lunchId,
-      }
-    })
+      },
+    });
 
     const dinnerFound = await prisma.food.findUnique({
       where: {
         id: found.dinnerId,
-      }
-    })
+      },
+    });
 
-    return res
-      .status(200)
-      .json(r({
-        status: "success", 
+    return res.status(200).json(
+      r({
+        status: "success",
         data: {
           id: found.id,
           calories: found.calories,
           protein: found.protein,
           breakfast: breakfastFound,
           lunch: lunchFound,
-          dinner: dinnerFound
-        }
-      }));
+          dinner: dinnerFound,
+        },
+      })
+    );
   } catch (e) {
     logger.error(e);
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
