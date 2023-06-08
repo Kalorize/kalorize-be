@@ -2,8 +2,7 @@ import axios from "axios";
 import r from "../utils/response.js";
 import FormData from "form-data";
 import fs from "fs";
-import { writeFile, unlink } from "fs/promises";
-import { extname, join, resolve } from "path";
+import { unlink } from "fs/promises";
 import { mlApiBaseUrl, mlApiKey } from "../config/vars.js";
 
 /**
@@ -20,15 +19,7 @@ async function predict(req, res) {
 
     const data = new FormData();
 
-    const file = join(
-      resolve(),
-      "temp",
-      `${Date.now()}${extname(req.file.originalname)}`
-    );
-
-    await writeFile(file, req.file.buffer);
-
-    data.append("picture", fs.createReadStream(file), {
+    data.append("picture", fs.createReadStream(req.file.path), {
       filename: req.file.filename,
       contentType: req.file.mimetype,
     });
@@ -39,7 +30,7 @@ async function predict(req, res) {
       }),
     });
 
-    unlink(file);
+    unlink(req.file.path);
 
     return res.status(200).json(api.data);
   } catch (e) {
