@@ -252,8 +252,6 @@ async function choose(req, res) {
         .json(r({ status: "success", data: { updateFood } }));
     }
 
-    console.log(req.user.id);
-
     const chooseFood = await prisma.foodHistory.create({
       data: {
         userId: Number(req.user.id),
@@ -306,11 +304,9 @@ async function getFood(req, res) {
 
     const dateString = date.toISOString().split("T")[0];
 
-    let found = history.map((e) => {
-      if (e.date == dateString) {
-        return e;
-      }
-    })[0];
+    const foundList = await Promise.all( history.filter((e) => e.date == dateString));
+
+    const found = foundList.at(-1);
 
     if (!found) {
       return res
