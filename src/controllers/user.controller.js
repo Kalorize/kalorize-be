@@ -215,17 +215,17 @@ async function choose(req, res) {
 
     const dateAdd = new Date(time).toISOString().split("T")[0];
 
-    const history = await prisma.foodHistory.findMany({
+    let history = await prisma.foodHistory.findMany({
       where: {
         userId: Number(req.user.id),
       },
     });
 
-    const found = history.map((e) => {
-      if (e.date == dateAdd) {
-        return e;
-      }
-    })[0];
+    const dateString = date.toISOString().split("T")[0];
+
+    const foundList = await Promise.all( history.filter((e) => e.date == dateString));
+
+    const found = foundList.at(-1);
 
     const recData = await prisma.reccomendation.findFirstOrThrow({
       where: {
