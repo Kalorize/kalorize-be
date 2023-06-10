@@ -3,7 +3,7 @@ import { join, resolve, extname } from "path";
 
 export const upload = multer({
   limits: {
-    fileSize: 5 * 1024 * 1024,
+    fileSize: 10 * 1024 * 1024,
   },
 });
 
