@@ -1,0 +1,423 @@
+{
+	"info": {
+		"_postman_id": "ffe4c377-b262-4529-8566-9aeac27b5320",
+		"name": "Kalorize",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27605505",
+		"_collection_link": "https://kalorize.postman.co/workspace/Team-Workspace~d6f8b19c-43cb-4043-8b31-53381d6c4934/collection/27605505-ffe4c377-b262-4529-8566-9aeac27b5320?action=share&creator=27605505&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"im@n.com\",\r\n    \"password\": \"mrongozz\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Handiism\",\r\n    \"email\": \"im@n.com\",\r\n    \"password\": \"mrongozz\",\r\n    \"repassword\": \"mrongozz\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Me",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwiaWF0IjoxNjg1ODA0MDQ3fQ.uJnxrH-33rA8ae8VFFBb16kvRxud9gD5E-PfFnczOVs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password (Request OTP)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mail@example.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/auth/forgot-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password (Validating OTP)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mail@example.com\",\r\n    \"otp\": \"0000\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/auth/forgot-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password (Update New Password)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"mhrachmawan@gmail.com\",\r\n    \"newpassword\": \"kvmpvng\",\r\n    \"renewpassword\": \"kvmpvng\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/auth/forgot-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Update (preferences, targets, settings, reccomendation)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwiaWF0IjoxNjg1ODA0MDQ3fQ.uJnxrH-33rA8ae8VFFBb16kvRxud9gD5E-PfFnczOVs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "picture",
+									"type": "file",
+									"src": "/D:/Downloads/7m5upd.jpg"
+								},
+								{
+									"key": "gender",
+									"value": "MALE",
+									"description": "one of ['MALE', 'FEMALE']",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "age",
+									"value": "8",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "height",
+									"value": "160",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "weight",
+									"value": "50",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "password",
+									"value": "qwqwqwqwqw",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "target",
+									"value": "REDUCE_WEIGHT",
+									"description": "one of ['REDUCE_WEIGHT', 'INCREASE_MUSCLE', 'BE_HEALTHY']",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "activity",
+									"value": "EASY",
+									"description": "one of ['EASY', 'MEDIUM', 'HARD', 'EXTREME']",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "name",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Choose Food",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNjg2MDMyNjI5fQ.lCbP1k2Xpx8Cp0zdsduqAuf15d6n_b1SG0kmjk-pQ-g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"breakfast\": {\r\n            \"id\": 17265 //the only required field\r\n        },\r\n    \"lunch\": {\r\n            \"id\": 58400 //the only required field\r\n        }, \r\n    \"dinner\": {\r\n            \"id\": 538861, //the only required field\r\n            \"Calories\": 947.5, //optional field\r\n            \"CarbohydrateContent\": 113.4, //optional field\r\n            \"CholesterolContent\": 145.8, //optional field\r\n            \"CookTime\": \"PT25M\", //optional field\r\n            \"FatContent\": 21.7, //optional field\r\n            \"FiberContent\": 4.8, //optional field\r\n            \"ImageUrl\": \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-kH2egjtv7TTg5XDsrI0_4j26uVWgPXWTA1xl29JcyZNfzbq6mvskj9cfPw&s\", //optional field\r\n            \"Name\": \"Stuffed Cornish Hen\", //optional field\r\n            \"PrepTime\": \"PT30M\", //optional field\r\n            \"ProteinContent\": 42.2, //optional field\r\n            \"RecipeIngredientParts\": \"port wine, garlic, Stove Top stuffing mix, fresh ground pepper, rosemary, butter\", //optional field\r\n            \"RecipeInstructions\": \"Bake the hen in the oven for 30 min at 400 deg or deep fry for 20 min at 320 deg.  when done cut in half from breast down, remove rib bones then set aside the bird.  prep stuffing mix in a bowl and heat 8 ouces of port wine, 1 cup of chicken stock, and 2 cloves of garlic in sauce pan.  once hot pour mitur over stuffing mix.  stuff chicken with stuffing mixture in heaping portions and top with parm cheese, rosemary, then butter.  place on a tray in the oven at 400 deg for 25 minute  mix the gravy pack in a shaker jar with 1/2 cup chicken stock  and 1/2 cup water then heat in a sauce pan mixing frequently.add 1 tbls of fresh ground pepper.  remove hen from oven and pour gravy over top and enjoy, you wont be disappointed!\", //optional field\r\n            \"SaturatedFatContent\": 9.9, //optional field\r\n            \"SodiumContent\": 2236.8, //optional field\r\n            \"SugarContent\": 21.2, //optional field\r\n            \"TotalTime\": \"PT55M\" //optional field\r\n        },\r\n        \"date\": \"2020-03-03\"//optional\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/user/choose-food",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"choose-food"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get History By Date",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiaWF0IjoxNjg2MDMyNjI5fQ.lCbP1k2Xpx8Cp0zdsduqAuf15d6n_b1SG0kmjk-pQ-g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/user/get-food?date=2020-03-03",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"get-food"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2020-03-03"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "F2HWG",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjg2MjUwODQyfQ.bJDXKfIb0khMTuKhxQJVeNfSr4AA8vnPnwlF91jAm-Y",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "picture",
+							"type": "file",
+							"src": "/D:/Downloads/KTM.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/v1/f2hwg",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"f2hwg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Food By Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/v1/food/41",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"v1",
+						"food",
+						"41"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
