@@ -60,4 +60,4 @@ Project is created with:
 | v1/user/get-food?date={yyyy-mm-dd} | GET | Authorization header bearer token | HTTP GET REQUEST get user chosen food history by date |
 
 ## Security Concern
-We understand that our server is have no security protection cause anyone can POST data to our server and causing a malfunction or overloading server, this is just temporary solution cause we lack of time but we will commit to build secure server soon if we pass to the next round of bangkit
+Right now our server can be accessed by everyone without using our APP. This problem could caused a lot of traffic on our server making it vulnerable againts many cyber attacks. On further development we will deal with our server security problem.
