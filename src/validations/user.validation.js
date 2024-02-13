@@ -19,7 +19,7 @@ const choose = z.object({
   breakfast: foodSchema,
   lunch: foodSchema,
   dinner: foodSchema,
-  date: z.coerce.date().optional(),
+  date: z.coerce.date().optional().default(new Date()),
 });
 
 const getFood = z.object({

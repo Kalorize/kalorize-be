@@ -19,20 +19,8 @@ model User {
   height         Float?
   activity       Activity?
   target         Target?
-  otp            Otp?
   foodHistories  FoodHistory[]
   reccomendation Reccomendation?
-}
-
-model Otp {
-  user      User      @relation(fields: [userEmail], references: [email])
-  id        Int       @id @default(autoincrement())
-  userEmail String    @unique
-  code      String
-  valid     Boolean   @default(false)
-  chance    Int?
-  expired   DateTime // batas waktu verifikasi
-  lifetime  DateTime? // umur dari otp yang valid
 }
 
 model Reccomendation {

@@ -12,11 +12,4 @@ export const userInclude = {
       lunch: true,
     },
   },
-  foodHistories: {
-    include: {
-      breakfast: true,
-      dinner: true,
-      lunch: true,
-    },
-  },
 };

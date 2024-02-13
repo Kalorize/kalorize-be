@@ -9,4 +9,4 @@ await prisma
   .then(() => logger.info(`Database connected to ${mysql}`));
 
 // start web server
-app.listen(port, () => logger.info(`Server started on port ${port} (${env})`));
+app.listen(port, "0.0.0.0", () => logger.info(`Server started on port ${port} (${env})`));

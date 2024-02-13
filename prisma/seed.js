@@ -40,15 +40,19 @@ stream.on("data", async (r) => {
 });
 
 stream.on("end", async () => {
-  for (const row of rows) {
-    await prisma.food.upsert({
-      create: row,
-      update: row,
-      where: {
-        id: row.id,
-      },
-    });
-  }
+  
+  await prisma.food.createMany({
+    data: rows
+  })
+  // for (const row of rows) {
+  //   await prisma.food.upsert({
+  //     create: row,
+  //     update: row,
+  //     where: {
+  //       id: row.id,
+  //     },
+  //   });
+  // }
 });
 
 stream.on("error", (e) => {
