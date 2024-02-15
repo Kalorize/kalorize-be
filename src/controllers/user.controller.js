@@ -211,7 +211,7 @@ async function choose(req, res) {
       req.body
     );
 
-    const dateString = date.toISOString().split("T")[0];
+    const dateString = date.toLocaleDateString()
     const history = await prisma.foodHistory.findFirst({
       where: {
         userId: Number(req.user.id),
@@ -281,9 +281,7 @@ async function getFood(req, res) {
       },
     });
 
-    const dateString = date.toISOString().split("T")[0];
-
-    const foundList = await Promise.all(history.filter((e) => e.date == dateString));
+    const foundList = await Promise.all(history.filter((e) => e.date == date.toLocaleDateString()));
 
     const found = foundList.at(-1);
 
