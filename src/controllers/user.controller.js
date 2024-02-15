@@ -281,6 +281,7 @@ async function getFood(req, res) {
       },
     });
 
+    history.forEach(e => console.log(e.date, date.toLocaleDateString()))
     const foundList = await Promise.all(history.filter((e) => e.date == date.toLocaleDateString()));
 
     const found = foundList.at(-1);
